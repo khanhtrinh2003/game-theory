@@ -19,7 +19,7 @@ class Calculation():
 class Graph():
     def __init__(self, A, p2):
         self.A = A
-        self.p2 = p2
+        self.p2 = [i/sum(p2) for i in p2]
         self.n = 50000
         
         num =len(self.p2)
