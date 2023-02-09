@@ -22,7 +22,7 @@ class Kiem_dinh():
         self.Peo1 = list(range(self.so_chien_luoc1))
         self.Peo2 = list(range(self.so_chien_luoc2))
 
-    def mat_do_loi_ich(self): 
+    def mat_do_loi_ich(self,kind="hist"): 
         
         u1 =[]
         u2 = []
@@ -37,8 +37,8 @@ class Kiem_dinh():
         u = pd.DataFrame({f"Lợi ích của người 1": u1,f"Lợi ích của người 2": u2})
         
         fig= plt.subplots(1,1)
-        u[f"Lợi ích của người 1"].plot(kind='hist')
-        u[f"Lợi ích của người 2"].plot(kind='hist')
+        u[f"Lợi ích của người 1"].plot(kind=kind)
+        u[f"Lợi ích của người 2"].plot(kind=kind)
         plt.legend()
         plt.xlabel("Lợi ích thu được được")
         plt.savefig(fname='test')
