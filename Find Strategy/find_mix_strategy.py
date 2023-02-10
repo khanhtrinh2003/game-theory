@@ -23,4 +23,4 @@ def find_mix_strategy(payoff1, payoff2):
     b_eq = np.ones(2)
     c = np.array([0] * len(t) + [1,1])
     res = linprog(c, A_ub=A_ub, b_ub=b_ub,bounds=(0, None), A_eq=A_eq,b_eq=b_eq)
-    return f"Chiến lược của người 1:{res.x[len(payoff1):len(payoff1)+len(payoff2)]}\n Chiến lược của người 2:{res.x[:len(payoff1)]},\nKỳ vọng của người 1: {res.x[len(payoff1)+len(payoff2):len(payoff1)+len(payoff2)+1]},\nKỳ vọng của người 2: {res.x[len(payoff1)+len(payoff2)+1:len(payoff1)+len(payoff2)+2]}"
+    return f"Chiến lược của người 1:{res.x[len(payoff1):len(payoff1)+len(payoff2)]}\nChiến lược của người 2:{res.x[:len(payoff1)]},\nKỳ vọng của người 1: {res.x[len(payoff1)+len(payoff2):len(payoff1)+len(payoff2)+1]},\nKỳ vọng của người 2: {res.x[len(payoff1)+len(payoff2)+1:len(payoff1)+len(payoff2)+2]}"
