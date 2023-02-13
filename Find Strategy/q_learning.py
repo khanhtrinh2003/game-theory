@@ -50,7 +50,7 @@ class find_best_strategy():
     
     def update(self, stra, reward):
         stra.k = stra.k+1
-        stra.q = stra.q + 1/stra.k * (reward-stra.q)
+        stra.q = stra.q*0.9+0.1*reward 
 
     def show_statistics(self):
         for i in range(self.num_strategy):    
