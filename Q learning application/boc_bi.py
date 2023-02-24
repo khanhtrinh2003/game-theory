@@ -93,7 +93,7 @@ if __name__ == '__main__':
     ai_player_1.EPSILON = EPSILON
     ai_player_2.EPSILON = EPSILON
 
-    for _ in range(50000):
+    for _ in range(10000):
         game = Tree1(ai_player_1, ai_player_2)
         game.play()
 
