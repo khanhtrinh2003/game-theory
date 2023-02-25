@@ -25,7 +25,8 @@ class Tree1:
                 player = self.player2
 
             self.first = not self.first
-            move = player.make_move(self.sobi)
+            move = player.make_move(self.board)
+            
             self.sobi -= move
             self.board.append(self.sobi)
             print(self.sobi)
@@ -38,42 +39,63 @@ class Tree1:
                 print(f"Winner: {winner.__class__.__name__}, Loser: {loser.__class__.__name__}")
                 break
 
-class AIPlayer:
-    def __init__(self):
-        self.q = defaultdict(lambda: DEFAULT_Q)
-        self.sobi = None
+class AIPlayer():
+
+    def __init__(self, epsilon=0.4, alpha=0.3, gamma=0.9, default_q=0):
+
+        self.EPSILON = epsilon
+        self.ALPHA = alpha
+        self.GAMMA = gamma
+        self.DEFAULT_Q = default_q
+        self.q = {}
         self.move = None
-        self.EPSILON = EPSILON
-        self.available_actions = None
-        self.board = tuple()  # convert board to a tuple
+        self.board = tuple()
 
-    def make_move(self, sobi):
-        self.board += (self.sobi,)  # append to the tuple
-        if (sobi <= 4) & (sobi > 0):
-            self.available_actions = list(range(1, sobi + 1))
-        else:
-            self.available_actions = ACTIONS 
+    # these are available or empty cells on the grid (board)
+    def available_moves(self, board):
+        return  [ACTIONS if board[-1]>4 else list(range(1, board[-1]+1))][0]
 
-        if random.random() < self.EPSILON:
-            self.move = random.choice(self.available_actions)
-        else:
-            q_values = [self.get_q(self.board, a) for a in self.available_actions]
-            max_q_value = max(q_values)
-            best_actions = [i for i in range(len(self.available_actions)) if q_values[i] == max_q_value]
-            best_move = self.available_actions[random.choice(best_actions)]
-            self.move = best_move
-        
-        return self.move
-
+    # Q(s,a) -> Q value for (s,a) pair - if no Q value exists then create a new one with the
+    # default value (=1) and otherwise we return the q value present in the dict
     def get_q(self, state, action):
+        if self.q.get((state, action)) is None:
+            self.q[(state, action)] = self.DEFAULT_Q
+
         return self.q[(state, action)]
 
-    def reward(self, reward, state):
-        st = tuple(state)
+
+    def make_move(self, board):
+
+        self.board += tuple(board)
+        actions = self.available_moves(board)
+
+        # action with epsilon probability
+        if random.random() < self.EPSILON:
+            # this is in index (0-8 board cell related index)
+            self.move = random.choice(actions)
+            return self.move
+
+        # take the action with highest Q value
+        q_values = [self.get_q(self.board, a) for a in actions]
+        max_q_value = max(q_values)
+
+        # if multiple best actions, choose one at random
+        if q_values.count(max_q_value) > 1:
+            best_actions = [i for i in range(len(actions)) if q_values[i] == max_q_value]
+            best_move = actions[random.choice(best_actions)]
+        # there is just a single best move (best action)
+        else:
+            best_move = actions[q_values.index(max_q_value)]
+
+        self.move = best_move
+        return self.move
+
+    # let's evaluate a given state: so update the Q(s,a) table regarding s state and a action
+    def reward(self, reward, board):
         if self.move:
-            prev_q = self.get_q(st, self.move)
-            max_q_new = max([self.get_q(st, a) for a in self.available_actions])
-            self.q[(self.board, self.move)] = prev_q + ALPHA * (reward + GAMMA * max_q_new - prev_q)
+            prev_q = self.get_q(self.board, self.move)
+            max_q_new = max([self.get_q(tuple(board), a) for a in self.available_moves(self.board)])
+            self.q[(self.board, self.move)] = prev_q + self.ALPHA * (reward + self.GAMMA * max_q_new - prev_q)
 
 class HumanPlayer:
     def reward(self, reward, state):
@@ -86,15 +108,13 @@ class HumanPlayer:
 if __name__ == '__main__':
 
     ai_player_1 = AIPlayer()
-    ai_player_2 = AIPlayer()
 
     print('Training the AI player(s)...')
 
     ai_player_1.EPSILON = EPSILON
-    ai_player_2.EPSILON = EPSILON
 
-    for _ in range(10000):
-        game = Tree1(ai_player_1, ai_player_2)
+    for _ in range(100):
+        game = Tree1(ai_player_1, ai_player_1)
         game.play()
 
     print('\nTraining is Done')
